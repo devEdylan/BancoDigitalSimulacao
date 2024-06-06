@@ -10,6 +10,7 @@ public abstract class Conta{
     private static final int AGENCIA_PADRAO = 1;
     private static int SEQUENCIAL = 1;
 
+    protected double limiteSaque;
     protected int agencia;
     protected int numero;
     protected double saldo;
@@ -23,8 +24,11 @@ public abstract class Conta{
     }
 
     public void sacar(double valor) {
-        saldo -= valor;
-        operacoesRealizadas.add(new Operacao("Saque", valor));
+        if (verificarSaldo(valor)){
+            saldo -= valor;
+            operacoesRealizadas.add(new Operacao("Saque", valor));
+        }
+
     }
 
     public void depositar(double valor) {
@@ -33,9 +37,12 @@ public abstract class Conta{
     }
 
     public void transferir(double valor, Conta contaDestino) {
-        this.sacar(valor);
-        contaDestino.depositar(valor);
-        operacoesRealizadas.add(new Operacao("Transferencia", valor, contaDestino));
+        if (verificarSaldo(valor)){
+            saldo -= valor;
+            contaDestino.saldo += valor;
+            operacoesRealizadas.add(new Operacao("Transferencia", valor, contaDestino));
+            contaDestino.operacoesRealizadas.add(new Operacao("Transferencia", valor, contaDestino));
+        }
     }
 
     public int getAgencia() {
@@ -59,6 +66,53 @@ public abstract class Conta{
 
     public void getOperacoesRealizadas(){
         operacoesRealizadas.stream().forEach(n -> System.out.println(n));
+    }
+
+    private boolean verificarSaldo(double valor){
+        if ((saldo > limiteSaque) && (limiteSaque != 0)){
+            System.out.println("Limite de Saque Atingido. Operação Negada.");
+            return false;
+        }
+        if (saldo < valor){
+            System.out.println("Saldo insuficiente");
+            return false;
+        }
+        return true;
+
+    }
+    public void definirLimiteSaque(double lim){
+        this.limiteSaque = lim;
+        operacoesRealizadas.add(new Operacao("Definição de limite de saque", lim));
+    }
+
+    public void desfazerUltimaOperacao(){
+        int ultimaOperacaoIndex = operacoesRealizadas.size() - 1;
+        Operacao ultimaOperacao = operacoesRealizadas.get(ultimaOperacaoIndex);
+        String nomeOperacao = ultimaOperacao.getNomeOperacao();
+        Double valorOperacao = ultimaOperacao.getValor();
+        Conta contaDestinoOperacao = ultimaOperacao.getContadestino();
+        switch (nomeOperacao){
+            case "Saque":
+                saldo += valorOperacao;
+                break;
+            case "Depósito":
+                saldo -= valorOperacao;
+                break;
+            case "Transferencia":
+                contaDestinoOperacao.saldo -= valorOperacao;
+                this.saldo += valorOperacao;
+            case "Definição de limite de saque":
+                this.limiteSaque = 0;
+                break;
+            default:
+                System.out.println("Nenhuma operação foi realizada para poder ser desfeita.");
+        }
+        operacoesRealizadas.remove(ultimaOperacaoIndex);
+        operacoesRealizadas.add(new Operacao("Ultima operação cancelada", 0));
+        if (nomeOperacao.equalsIgnoreCase("Transferencia")){
+            contaDestinoOperacao.operacoesRealizadas.remove(ultimaOperacaoIndex);
+            contaDestinoOperacao.operacoesRealizadas.add(new Operacao("Ultima operação cancelada", 0));
+        }
     }
 
     public abstract void imprimirExtrato();

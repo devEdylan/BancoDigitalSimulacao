@@ -3,9 +3,9 @@ package edu.devEdylan.operacoes;
 import edu.devEdylan.model.Conta;
 
 public class Operacao {
-    double valor;
-    String nomeOperacao;
-    Conta contadestino;
+    private double valor;
+    private String nomeOperacao;
+    private Conta contadestino;
 
     public Operacao(String nomeOperacao, double valor){
         this.nomeOperacao = nomeOperacao;
@@ -18,6 +18,18 @@ public class Operacao {
             this.valor = valor;
             this.contadestino = contadestino;
         }
+    }
+
+    public double getValor() {
+        return valor;
+    }
+
+    public String getNomeOperacao() {
+        return nomeOperacao;
+    }
+
+    public Conta getContadestino() {
+        return contadestino;
     }
 
     public String toString() {
