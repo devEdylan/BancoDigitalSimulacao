@@ -99,8 +99,8 @@ public abstract class Conta{
                 saldo -= valorOperacao;
                 break;
             case "Transferencia":
-                contaDestinoOperacao.saldo -= valorOperacao;
-                this.saldo += valorOperacao;
+                System.out.println("Não é possível desfazer uma transferência, visto que envolve o domínio monetário de outrem, solicite à conta destino da transferência, a devolução!");
+                break;
             case "Definição de limite de saque":
                 this.limiteSaque = 0;
                 break;
@@ -108,11 +108,6 @@ public abstract class Conta{
                 System.out.println("Nenhuma operação foi realizada para poder ser desfeita.");
         }
         operacoesRealizadas.remove(ultimaOperacaoIndex);
-        operacoesRealizadas.add(new Operacao("Ultima operação cancelada", 0));
-        if (nomeOperacao.equalsIgnoreCase("Transferencia")){
-            contaDestinoOperacao.operacoesRealizadas.remove(ultimaOperacaoIndex);
-            contaDestinoOperacao.operacoesRealizadas.add(new Operacao("Ultima operação cancelada", 0));
-        }
     }
 
     public abstract void imprimirExtrato();

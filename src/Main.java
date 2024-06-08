@@ -20,6 +20,9 @@ public class Main {
         cc.desfazerUltimaOperacao();
         cc.imprimirExtrato();
         poupanca.imprimirExtrato();
+        System.out.println("==============");
+        poupanca.desfazerUltimaOperacao();
+
     }
 
 }
